@@ -6,6 +6,10 @@ import akka.http.scaladsl.model.HttpRequest
 import akka.stream.ActorMaterializer
 import kamon.Kamon
 
+/**
+  * A very simple akka-http based client
+  * @author Peter Nerg
+  */
 object SimpleKamonClient extends App {
 
   Kamon.init(kamonConfig)

@@ -7,26 +7,42 @@ import akka.http.scaladsl.server.Directives.{complete, get, pathPrefix, _}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
+import com.typesafe.scalalogging.LazyLogging
 import kamon.Kamon
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Random, Success}
 
-object SimpleKamonServer extends App {
+/**
+  * A very simple akka-http based server
+  * @author Peter Nerg
+  */
+object SimpleKamonServer extends App with LazyLogging {
 
   Kamon.init(kamonConfig)
+
+  private val rand = new Random()
 
   private implicit val system = ActorSystem("simple-kamon-server")
   private implicit val materializer = ActorMaterializer()
   private implicit val executionContext = system.dispatcher
 
+  
   private def traceID = Kamon.currentSpan().trace.id.string
+  
+  private def pause:Unit = Thread.sleep(rand.nextInt(300).longValue)
   
   private lazy val route: Route =
     pathPrefix("api" / "execute" / Remaining) { order =>
       get {
-        println("api/execute -> "+ContextUtil.xTraceTokenValue +" : "+ traceID)
-        Kamon.clientSpanBuilder("read.user.data", "database").start().finish()
-        Kamon.clientSpanBuilder("update.cache", "in-memory").start().finish()
+        Kamon.runWithSpan(Kamon.clientSpanBuilder("read.user.data", "database").tagMetrics("method", "read").start(), true) {
+          //simulates some work
+          pause
+        }
+
+        Kamon.runWithSpan(Kamon.clientSpanBuilder("update.cache", "in-memory").start(), true) {
+          //simulates some work
+          pause
+        }
         
         val response =
           s"""
@@ -39,16 +55,8 @@ object SimpleKamonServer extends App {
         complete(HttpEntity(ContentTypes.`application/json`, response))
       }
      } ~
-    pathPrefix("api" / "customer" / Segment / Remaining) { (id, order) =>
-        get {
-          Kamon.clientSpanBuilder("read.user.data", "database").start().finish()
-          Kamon.clientSpanBuilder("update.cache", "in-memory").start().finish()
-          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, s"<h1>HELLO WORLD!</h1>"))
-        }
-    } ~ 
    pathPrefix("health") {
      get {
-       println("health")
        complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, "OK!"))
      }
    } ~ 
@@ -67,7 +75,6 @@ object SimpleKamonServer extends App {
           ex.printStackTrace()
           ???
       }
-
     }
   }
   
@@ -76,7 +83,6 @@ object SimpleKamonServer extends App {
     .bindAndHandle(route, "0.0.0.0", 9696)
     .map(_.localAddress)
     .onComplete({ case Success(addr) => 
-      val port = addr.getPort
-      println("Started on port " + port)
+      logger.info(s"Started on port ${addr.getPort}")
     })
 }
