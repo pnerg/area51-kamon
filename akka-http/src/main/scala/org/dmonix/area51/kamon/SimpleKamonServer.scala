@@ -26,6 +26,10 @@ object SimpleKamonServer extends App with LazyLogging {
   private implicit val materializer = ActorMaterializer()
   private implicit val executionContext = system.dispatcher
 
+  //dummy counters just for testing
+  private val reqCounter = Kamon.counter("execute.requests")
+  private val businessCounter = reqCounter.withTag("type", "business")
+  private val nonbusinessCounter = reqCounter.withTag("type", "non-business")
   
   private def traceID = Kamon.currentSpan().trace.id.string
   
@@ -52,11 +56,13 @@ object SimpleKamonServer extends App with LazyLogging {
              |}
            """.stripMargin
         
+        businessCounter.increment()
         complete(HttpEntity(ContentTypes.`application/json`, response))
       }
      } ~
    pathPrefix("health") {
      get {
+       nonbusinessCounter.increment()
        complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, "OK!"))
      }
    } ~ 
@@ -67,6 +73,7 @@ object SimpleKamonServer extends App with LazyLogging {
         response <- Http().singleRequest(HttpRequest(uri = "http://localhost:9696/api/execute/"+System.currentTimeMillis()))
         r <- Unmarshal(response.entity).to[String]
       } yield {
+        businessCounter.increment()
         complete(HttpEntity(ContentTypes.`application/json`, r))
       }
       onComplete(f) {
