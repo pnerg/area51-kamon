@@ -5,12 +5,10 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest}
 import akka.http.scaladsl.server.Directives.{complete, get, pathPrefix, _}
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
 import kamon.Kamon
 
-import scala.util.{Failure, Random, Success}
 
 /**
   * A very simple akka-http based server
@@ -20,76 +18,27 @@ object SimpleKamonServer extends App with LazyLogging {
 
   Kamon.init(kamonConfig)
 
-  private val rand = new Random()
-
   private implicit val system = ActorSystem("simple-kamon-server")
   private implicit val materializer = ActorMaterializer()
   private implicit val executionContext = system.dispatcher
 
-  //dummy counters just for testing
-  private val reqCounter = Kamon.counter("execute.requests")
-  private val businessCounter = reqCounter.withTag("type", "business")
-  private val nonbusinessCounter = reqCounter.withTag("type", "non-business")
-  
   private def traceID = Kamon.currentSpan().trace.id.string
-  
-  private def pause:Unit = Thread.sleep(rand.nextInt(300).longValue)
   
   private lazy val route: Route =
     pathPrefix("api" / "execute" / Remaining) { order =>
       get {
-        Kamon.runWithSpan(Kamon.clientSpanBuilder("read.user.data", "database").tagMetrics("method", "read").start(), true) {
-          //simulates some work
-          pause
-        }
-
-        Kamon.runWithSpan(Kamon.clientSpanBuilder("update.cache", "in-memory").start(), true) {
-          //simulates some work
-          pause
-        }
-        
-        val response =
-          s"""
-             |{
-             | "x-trace-token":"${ContextUtil.xTraceTokenValueOrUndefined}",
-             | "trace-id":"${traceID}"
-             |}
-           """.stripMargin
-        
-        businessCounter.increment()
-        complete(HttpEntity(ContentTypes.`application/json`, response))
+        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "Hello World!"))
       }
-     } ~
-   pathPrefix("health") {
-     get {
-       nonbusinessCounter.increment()
-       complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, "OK!"))
      }
-   } ~ 
-  pathPrefix("forward") {
-    get {
-      println("forward -> "+ContextUtil.xTraceTokenValue +" : "+ traceID)
-      val f = for {
-        response <- Http().singleRequest(HttpRequest(uri = "http://localhost:9696/api/execute/"+System.currentTimeMillis()))
-        r <- Unmarshal(response.entity).to[String]
-      } yield {
-        businessCounter.increment()
-        complete(HttpEntity(ContentTypes.`application/json`, r))
-      }
-      onComplete(f) {
-        case Success(x) => x
-        case Failure(ex) =>
-          ex.printStackTrace()
-          ???
-      }
-    }
-  }
-  
   
   Http()
-    .bindAndHandle(route, "0.0.0.0", 9696)
+    .bindAndHandle(route, "0.0.0.0", 0)
     .map(_.localAddress)
-    .onComplete({ case Success(addr) => 
-      logger.info(s"Started on port ${addr.getPort}")
-    })
+    .flatMap{addr =>
+      val port = addr.getPort
+      logger.info(s"Started on port $port")
+      Http().singleRequest(HttpRequest(uri = s"http://localhost:$port/api/execute/do-it"))
+    }.foreach{ rsp => 
+      logger.info(rsp.status.toString())
+  }
 }
