@@ -51,7 +51,7 @@ lazy val common = project.in(file("common"))
       "com.typesafe.akka" %% "akka-http-core"  % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http"       % akkaHttpVersion,
       "io.kamon" %% "kamon-instrumentation-common" % "2.0.1",
-      //"io.kamon" %% "kamon-system-metrics" % "2.0.0"
+      "io.kamon" %% "kamon-system-metrics" % "2.0.1",
       "io.kamon" %% "kamon-bundle" % "2.0.2",
       "io.kamon" %% "kamon-prometheus" % "2.0.0",
       "io.kamon" %% "kamon-zipkin" % "2.0.0",
