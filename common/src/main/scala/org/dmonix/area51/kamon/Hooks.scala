@@ -1,16 +1,17 @@
 package org.dmonix.area51.kamon
 
 import akka.http.scaladsl.model.Uri
+import com.typesafe.scalalogging.LazyLogging
 import kamon.tag.Lookups
 import kamon.trace.{Span, SpanBuilder}
 import kamon.trace.Tracer.{PreFinishHook, PreStartHook}
 
-class CustomPreStartHook extends PreStartHook with PathFilter {
+class CustomPreStartHook extends PreStartHook with PathFilter with LazyLogging {
   
   override def beforeStart(builder: SpanBuilder): Unit = {
     val path = builder.tags().get(Lookups.option("http.url")).map(Uri(_).path.toString).getOrElse("")
     
-    println("beforeStart : "+ContextUtil.xTraceTokenValueOrUndefined)
+    logger.info("beforeStart : "+ContextUtil.xTraceTokenValueOrUndefined)
     //val xtrace = ContextUtil.xTraceTokenValueOrUndefined
     
     Some(builder)
