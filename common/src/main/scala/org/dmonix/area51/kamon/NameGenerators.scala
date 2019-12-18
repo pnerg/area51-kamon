@@ -7,14 +7,24 @@ import kamon.instrumentation.http.HttpOperationNameGenerator
 /**
   * @author Peter Nerg
   */
-class CustomNameGenerator extends HttpOperationNameGenerator with LazyLogging {
-  logger.info("Creating CustomNameGenerator")
+class ClientNameGenerator extends HttpOperationNameGenerator with LazyLogging {
+  logger.info("Creating ClientNameGenerator")
   override def name(request: Request): Option[String] = {
-    logger.info("Name generator : "+request.path)
+    logger.info(request.path)
     Some(request.path)
   }
 }
 
+/**
+  * @author Peter Nerg
+  */
+class ServerNameGenerator extends HttpOperationNameGenerator with LazyLogging {
+  logger.info("Creating ServerNameGenerator")
+  override def name(request: Request): Option[String] = {
+    logger.info(request.path)
+    Some(request.path)
+  }
+}
 
 /**
   * @author Peter Nerg
