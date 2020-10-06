@@ -66,7 +66,7 @@ lazy val `akka-http-src` = project.in(file("akka-http/."))
   .settings(baseSettings)
   .dependsOn(common)
 
-lazy val instrumenation = project.in(file("instrumentation/area51-module"))
+lazy val instrumentation = project.in(file("instrumentation"))
   .settings(baseSettings)
   .settings(
     libraryDependencies ++= Seq(
@@ -91,7 +91,7 @@ lazy val server = project.in(file("akka-http/server"))
       "-Dkanela.show-banner=false",
       "-XX:NativeMemoryTracking=detail"
     )
-  ).dependsOn(common, reporters, instrumenation)
+  ).dependsOn(common, reporters, instrumentation)
 
 lazy val client = project.in(file("akka-http/client"))
   .settings(baseSettings)
