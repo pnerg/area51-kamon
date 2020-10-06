@@ -7,15 +7,12 @@ enablePlugins(JavaAgent)
 name := "area51-kamon"
 organization := "org.dmonix"
 version := "0.0.0"
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.3"
 publishArtifact := false
 publishArtifact in (Compile, packageBin) := false
 publishArtifact in (Compile, packageDoc) := false
 publishArtifact in (Compile, packageSrc) := false
 
-
-val akkaVersion = "2.5.25"
-val akkaHttpVersion = "10.1.9"
 
 // -----------------------------------------------------
 //  Shared/common settings
@@ -23,7 +20,7 @@ val akkaHttpVersion = "10.1.9"
 lazy val baseSettings = Seq(
   version := "0.0.0",
   organization := "org.dmonix",
-  scalaVersion := "2.12.10",
+  scalaVersion := "2.13.3",
   fork := true, //needed to get the java-options set properly during sbt run
   publishArtifact := false,
   publishArtifact in (Compile, packageBin) := false,
@@ -43,20 +40,23 @@ lazy val baseSettings = Seq(
 lazy val common = project.in(file("common"))
   .settings(baseSettings)
   .settings(
-    libraryDependencies ++= Seq(
-      "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.2",
-      "com.typesafe.akka" %% "akka-actor"   % akkaVersion,
-      "com.typesafe.akka" %% "akka-slf4j"   % akkaVersion,
-      "com.typesafe.akka" %% "akka-stream"  % akkaVersion,
-      "com.typesafe.akka" %% "akka-http-core"  % akkaHttpVersion,
-      "com.typesafe.akka" %% "akka-http"       % akkaHttpVersion,
-      //"io.kamon" %% "kamon-instrumentation-common" % "2.0.1",
-      //"io.kamon" %% "kamon-system-metrics" % "2.0.1",
-      "io.kamon" %% "kamon-bundle" % "2.0.5",
-      "io.kamon" %% "kamon-prometheus" % "2.0.0",
-      "io.kamon" %% "kamon-zipkin" % "2.0.0",
-      "org.slf4j" % "slf4j-simple" % "1.7.29"
-    ),
+    libraryDependencies ++= {
+      val akkaVersion = "2.6.9"
+      val akkaHttpVersion = "10.2.1"
+      val kamonVersion = "2.1.7"
+      Seq(
+        "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+        "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+        "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+        "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+        "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
+        "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+        "io.kamon" %% "kamon-bundle" % kamonVersion,
+        "io.kamon" %% "kamon-prometheus" % kamonVersion,
+        "io.kamon" %% "kamon-zipkin" % kamonVersion,
+        "org.slf4j" % "slf4j-simple" % "1.7.30"
+      )
+    },
   )
 
 // -----------------------------------------------------
@@ -75,7 +75,9 @@ lazy val server = project.in(file("akka-http/server"))
       "-Dkamon.prometheus.embedded-server.port=8000",
       "-Dkamon.trace.random-sampler.probability=1",
       "-Dkamon.zipkin.host=127.0.0.1",
-      "-Dkamon.environment.service=area51-server"
+      "-Dkamon.environment.service=area51-server",
+      "-Dkanela.show-banner=false",
+      "-XX:NativeMemoryTracking=detail"
     )
   ).dependsOn(common)
 

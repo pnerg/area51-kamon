@@ -29,8 +29,8 @@ object SimpleKamonServer extends App with LazyLogging {
 
   //dummy counters just for testing
   private val reqCounter = Kamon.counter("execute.requests")
-  private val businessCounter = reqCounter.withTag("type", "business")
-  private val nonbusinessCounter = reqCounter.withTag("type", "non-business")
+  private val businessCounter = reqCounter.withTag("type", "business").withTag("internal", "true")
+  private val nonbusinessCounter = reqCounter.withTag("type", "non-business").withTag("internal", "true")
   
   private def traceID = Kamon.currentSpan().trace.id.string
   
@@ -43,7 +43,7 @@ object SimpleKamonServer extends App with LazyLogging {
   }
 
   private def simulateSyncJob(operationName:String, component:String, method:String):Unit = {
-      Kamon.runWithSpan(Kamon.clientSpanBuilder(operationName, component).tagMetrics("method", method).start(), true) {
+      Kamon.runWithSpan(Kamon.clientSpanBuilder(operationName, component).tagMetrics("method", method).tagMetrics("private", "true").start(), true) {
         //simulates some work
         randomPause
       }
