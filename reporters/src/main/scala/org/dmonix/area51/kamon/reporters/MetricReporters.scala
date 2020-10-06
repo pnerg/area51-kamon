@@ -1,4 +1,4 @@
-package org.dmonix.area51.kamon
+package org.dmonix.area51.kamon.reporters
 
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging

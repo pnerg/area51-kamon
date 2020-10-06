@@ -1,7 +1,7 @@
 import sbt.Keys.publishArtifact
 
 resolvers += "Kamon" at "https://dl.bintray.com/kamon-io/snapshots/"
-enablePlugins(JavaAgent)
+//enablePlugins(JavaAgent)
 
 
 name := "area51-kamon"
@@ -31,7 +31,25 @@ lazy val baseSettings = Seq(
     "-language:implicitConversions",
     "-unchecked",
     "-deprecation",
-    "-encoding", "utf8")
+    "-encoding", "utf8"),
+    libraryDependencies ++= {
+    val akkaVersion = "2.6.9"
+    val akkaHttpVersion = "10.2.1"
+    val kamonVersion = "2.1.7"
+    Seq(
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+      "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+      "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+      "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+      "io.kamon" %% "kamon-bundle" % kamonVersion,
+      "io.kamon" %% "kamon-prometheus" % kamonVersion,
+      "io.kamon" %% "kamon-zipkin" % kamonVersion,
+      "org.slf4j" % "slf4j-simple" % "1.7.30"
+    )
+  },
+  
 )
 
 // -----------------------------------------------------
@@ -39,25 +57,7 @@ lazy val baseSettings = Seq(
 // -----------------------------------------------------
 lazy val common = project.in(file("common"))
   .settings(baseSettings)
-  .settings(
-    libraryDependencies ++= {
-      val akkaVersion = "2.6.9"
-      val akkaHttpVersion = "10.2.1"
-      val kamonVersion = "2.1.7"
-      Seq(
-        "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-        "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-        "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
-        "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-        "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
-        "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
-        "io.kamon" %% "kamon-bundle" % kamonVersion,
-        "io.kamon" %% "kamon-prometheus" % kamonVersion,
-        "io.kamon" %% "kamon-zipkin" % kamonVersion,
-        "org.slf4j" % "slf4j-simple" % "1.7.30"
-      )
-    },
-  )
+
 
 // -----------------------------------------------------
 //  AKKA-HTTP
@@ -65,6 +65,18 @@ lazy val common = project.in(file("common"))
 lazy val `akka-http-src` = project.in(file("akka-http/."))
   .settings(baseSettings)
   .dependsOn(common)
+
+lazy val instrumenation = project.in(file("instrumentation/area51-module"))
+  .settings(baseSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "io.kamon" % "kanela-agent" % "1.0.7" % "provided"
+    )
+  )
+  .dependsOn(common)
+
+lazy val reporters = project.in(file("reporters"))
+  .settings(baseSettings)
 
 lazy val server = project.in(file("akka-http/server"))
   .settings(baseSettings)
@@ -79,7 +91,7 @@ lazy val server = project.in(file("akka-http/server"))
       "-Dkanela.show-banner=false",
       "-XX:NativeMemoryTracking=detail"
     )
-  ).dependsOn(common)
+  ).dependsOn(common, reporters, instrumenation)
 
 lazy val client = project.in(file("akka-http/client"))
   .settings(baseSettings)
@@ -92,4 +104,4 @@ lazy val client = project.in(file("akka-http/client"))
       "-Dkamon.zipkin.host=127.0.0.1",
       "-Dkamon.environment.service=area51-client"
     )
-  ).dependsOn(common)
+  ).dependsOn(common, reporters)
