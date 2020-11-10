@@ -33,9 +33,9 @@ lazy val baseSettings = Seq(
     "-deprecation",
     "-encoding", "utf8"),
     libraryDependencies ++= {
-    val akkaVersion = "2.6.9"
+    val akkaVersion = "2.6.10"
     val akkaHttpVersion = "10.2.1"
-    val kamonVersion = "2.1.7"
+    val kamonVersion = "2.1.8"
     Seq(
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,
@@ -58,14 +58,6 @@ lazy val baseSettings = Seq(
 lazy val common = project.in(file("common"))
   .settings(baseSettings)
 
-
-// -----------------------------------------------------
-//  AKKA-HTTP
-// -----------------------------------------------------
-lazy val `akka-http-src` = project.in(file("akka-http/."))
-  .settings(baseSettings)
-  .dependsOn(common)
-
 lazy val instrumentation = project.in(file("instrumentation"))
   .settings(baseSettings)
   .settings(
@@ -77,6 +69,24 @@ lazy val instrumentation = project.in(file("instrumentation"))
 
 lazy val reporters = project.in(file("reporters"))
   .settings(baseSettings)
+
+// -----------------------------------------------------
+//  AKKA
+// -----------------------------------------------------
+lazy val akka = project.in(file("akka"))
+  .settings(baseSettings)
+  .settings(
+    mainClass in (Compile, run) := Some("org.dmonix.area51.kamon.akka.PingerPonger"),
+    javaOptions ++= Seq(
+      "-Dkamon.trace.random-sampler.probability=1",
+      "-Dkamon.zipkin.host=127.0.0.1",
+      "-Dkamon.environment.service=area51-akka"
+    )
+  ).dependsOn(common, reporters, instrumentation)
+
+lazy val `akka-http-src` = project.in(file("akka-http/."))
+  .settings(baseSettings)
+  .dependsOn(common)
 
 lazy val server = project.in(file("akka-http/server"))
   .settings(baseSettings)
