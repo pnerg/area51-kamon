@@ -1,0 +1,13 @@
+name: Build & Test
+
+on: [push, pull_request]
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: sbt test
+        with:
+          fail_ci_if_error: true
