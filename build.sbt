@@ -34,7 +34,7 @@ lazy val baseSettings = Seq(
     "-encoding", "utf8"),
     libraryDependencies ++= {
     val akkaVersion = "2.6.10"
-    val akkaHttpVersion = "10.2.1"
+    val akkaHttpVersion = "10.2.3"
     val kamonVersion = "2.1.8"
     Seq(
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
