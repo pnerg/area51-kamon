@@ -35,7 +35,7 @@ lazy val baseSettings = Seq(
     libraryDependencies ++= {
     val akkaVersion = "2.6.10"
     val akkaHttpVersion = "10.2.1"
-    val kamonVersion = "2.1.8"
+    val kamonVersion = "2.1.12"
     Seq(
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,
