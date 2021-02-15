@@ -33,7 +33,7 @@ lazy val baseSettings = Seq(
     "-deprecation",
     "-encoding", "utf8"),
     libraryDependencies ++= {
-    val akkaVersion = "2.6.10"
+    val akkaVersion = "2.6.12"
     val akkaHttpVersion = "10.2.3"
     val kamonVersion = "2.1.8"
     Seq(
