@@ -1,8 +1,6 @@
 import sbt.Keys.publishArtifact
 
 resolvers += "Kamon" at "https://dl.bintray.com/kamon-io/snapshots/"
-//enablePlugins(JavaAgent)
-
 
 name := "area51-kamon"
 organization := "org.dmonix"
@@ -33,20 +31,17 @@ lazy val baseSettings = Seq(
     "-deprecation",
     "-encoding", "utf8"),
     libraryDependencies ++= {
-    val akkaVersion = "2.6.12"
-    val akkaHttpVersion = "10.2.3"
-    val kamonVersion = "2.1.12"
     Seq(
-      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-      "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
-      "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-      "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
-      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
-      "io.kamon" %% "kamon-bundle" % kamonVersion,
-      "io.kamon" %% "kamon-prometheus" % kamonVersion,
-      "io.kamon" %% "kamon-zipkin" % kamonVersion,
-      "org.slf4j" % "slf4j-simple" % "1.7.30"
+      `scala-logging`,
+      `akka-actor`,
+      `akka-slf4j`,
+      `akka-stream`,
+      `akka-http-core`,
+      `akka-http`,
+      `kamon-bundle`,
+      `kamon-prometheus`,
+      `kamon-zipkin`,
+      `slf4j-simple`
     )
   },
   
