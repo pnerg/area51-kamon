@@ -11,7 +11,7 @@ object Dependencies extends AutoPlugin {
     val `akka-slf4j` = "com.typesafe.akka" %% "akka-slf4j" % `akka-actor`.revision
     val `akka-stream` = "com.typesafe.akka" %% "akka-stream" % `akka-actor`.revision
 
-    val `akka-http` = "com.typesafe.akka" %% "akka-http" % "10.2.3"
+    val `akka-http` = "com.typesafe.akka" %% "akka-http" % "10.2.4"
     val `akka-http-core` = "com.typesafe.akka" %% "akka-http-core" % `akka-http`.revision
 
     val `kamon-bundle` = "io.kamon" %% "kamon-bundle" % "2.1.12"
