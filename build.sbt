@@ -57,7 +57,7 @@ lazy val instrumentation = project.in(file("instrumentation"))
   .settings(baseSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.kamon" % "kanela-agent" % "1.0.8" % "provided"
+      "io.kamon" % "kanela-agent" % "1.0.9" % "provided"
     )
   )
   .dependsOn(common)
