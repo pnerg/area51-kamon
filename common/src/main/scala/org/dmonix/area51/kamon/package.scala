@@ -18,7 +18,9 @@ package object kamon {
   def kamonConfig = ConfigFactory.empty()
     .withFallback(ConfigFactory.defaultOverrides())
     .withFallback(ConfigFactory.defaultApplication)
-    .withFallback(configFromResource("/kamon.conf"))
     .withFallback(ConfigFactory.defaultReference())
     .resolve()
+
+  def defaultKamonConfig = ConfigFactory.defaultReference().resolve()
+
 }

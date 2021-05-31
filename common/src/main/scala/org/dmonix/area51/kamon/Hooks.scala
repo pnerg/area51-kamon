@@ -11,9 +11,7 @@ class CustomPreStartHook extends PreStartHook with PathFilter with LazyLogging {
   override def beforeStart(builder: SpanBuilder): Unit = {
     val path = builder.tags().get(Lookups.option("http.url")).map(Uri(_).path.toString).getOrElse("")
     
-    logger.info("beforeStart : "+ContextUtil.xTraceTokenValueOrUndefined)
-    //val xtrace = ContextUtil.xTraceTokenValueOrUndefined
-    
+
     Some(builder)
       .map(b => if(!accept(path)) b.doNotTrackMetrics() else b)
 //      .map(b => ContextUtil.xTraceTokenValue.map(b.tag("x-trace-token", _)).getOrElse(b))

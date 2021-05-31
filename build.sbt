@@ -110,3 +110,15 @@ lazy val client = project.in(file("akka-http/client"))
       "-Dkamon.environment.service=area51-client"
     )
   ).dependsOn(common, reporters)
+
+lazy val debug = project.in(file("akka-http/debug"))
+  .settings(baseSettings)
+  .settings(
+    mainClass in (Compile, run) := Some("org.dmonix.area51.kamon.DefaultDebugKamonServer"),
+    javaOptions ++= Seq(
+      "-Dkamon.prometheus.embedded-server.port=9000",
+      "-Dkamon.trace.random-sampler.probability=1",
+      "-Dkamon.zipkin.host=127.0.0.1",
+      "-Dkamon.environment.service=area51-kamon-debug-default-settings"
+    )
+  )

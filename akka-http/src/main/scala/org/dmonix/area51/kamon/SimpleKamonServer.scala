@@ -6,8 +6,8 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest}
 import akka.http.scaladsl.server.Directives.{complete, get, pathPrefix, _}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.ActorMaterializer
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.StrictLogging
 import kamon.Kamon
 
 import scala.concurrent.Future
@@ -17,14 +17,16 @@ import scala.util.Random
   * A very simple akka-http based server
   * @author Peter Nerg
   */
-object SimpleKamonServer extends App with LazyLogging {
+object SimpleKamonServer extends App with StrictLogging {
 
-  Kamon.init(kamonConfig)
+  Kamon.init(ConfigFactory.defaultOverrides()
+    .withFallback(ConfigFactory.defaultApplication)
+    .withFallback(ConfigFactory.defaultReference())
+    .resolve())
 
   private val rand = new Random()
 
   private implicit val system = ActorSystem("simple-kamon-server")
-  private implicit val materializer = ActorMaterializer()
   private implicit val executionContext = system.dispatcher
 
   //dummy counters just for testing
@@ -32,7 +34,7 @@ object SimpleKamonServer extends App with LazyLogging {
   private val businessCounter = reqCounter.withTag("type", "business").withTag("internal", "true")
   private val nonbusinessCounter = reqCounter.withTag("type", "non-business").withTag("internal", "true")
   
-  private def traceID = Kamon.currentSpan().trace.id.string
+  private def traceID:String = Kamon.currentSpan().trace.id.string
   
   private def randomPause:Unit = Thread.sleep(rand.nextInt(300).longValue)
   
@@ -102,13 +104,8 @@ object SimpleKamonServer extends App with LazyLogging {
 
 
   Http()
-    .bindAndHandle(route, "0.0.0.0", 9696)
+    .newServerAt("0.0.0.0", 9696)
+    .bind(route)
     .map(_.localAddress)
-    .flatMap{addr =>
-      val port = addr.getPort
-      logger.info(s"Started on port $port")
-      Http().singleRequest(HttpRequest(uri = s"http://localhost:$port/api/execute/do-it"))
-    }.foreach{ rsp =>
-    logger.info(rsp.status.toString())
-  }
+    .foreach(addr => logger.info(s"Started on port ${addr.getPort}"))
 }
