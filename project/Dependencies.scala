@@ -18,7 +18,7 @@ object Dependencies extends AutoPlugin {
     val `kamon-prometheus` = "io.kamon" %% "kamon-prometheus" % `kamon-bundle`.revision
     val `kamon-zipkin` = "io.kamon" %% "kamon-zipkin" % `kamon-bundle`.revision
 
-    val `slf4j-simple` = "org.slf4j" % "slf4j-simple" % "1.7.30"
+    val `slf4j-simple` = "org.slf4j" % "slf4j-simple" % "1.7.31"
 
   }
 
