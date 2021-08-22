@@ -7,7 +7,7 @@ object Dependencies extends AutoPlugin {
 
     val `scala-logging` = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4"
 
-    val `akka-actor` = "com.typesafe.akka" %% "akka-actor" % "2.6.15"
+    val `akka-actor` = "com.typesafe.akka" %% "akka-actor" % "2.6.16"
     val `akka-slf4j` = "com.typesafe.akka" %% "akka-slf4j" % `akka-actor`.revision
     val `akka-stream` = "com.typesafe.akka" %% "akka-stream" % `akka-actor`.revision
 
