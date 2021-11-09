@@ -1,3 +1,3 @@
 logLevel := Level.Warn
 
-addSbtPlugin("io.kamon" % "sbt-kanela-runner" % "2.0.6")
+addSbtPlugin("io.kamon" % "sbt-kanela-runner" % "2.0.12")
