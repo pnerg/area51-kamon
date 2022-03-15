@@ -41,6 +41,7 @@ lazy val baseSettings = Seq(
       `kamon-bundle`,
       `kamon-prometheus`,
       `kamon-zipkin`,
+      `kamon-opentelemetry`,
       `slf4j-simple`
     )
   },
