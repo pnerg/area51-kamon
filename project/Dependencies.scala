@@ -14,7 +14,7 @@ object Dependencies extends AutoPlugin {
     val `akka-http` = "com.typesafe.akka" %% "akka-http" % "10.2.7"
     val `akka-http-core` = "com.typesafe.akka" %% "akka-http-core" % `akka-http`.revision
 
-    val `kamon-bundle` = "io.kamon" %% "kamon-bundle" % "2.5.0"
+    val `kamon-bundle` = "io.kamon" %% "kamon-bundle" % "2.5.12"
     val `kamon-prometheus` = "io.kamon" %% "kamon-prometheus" % `kamon-bundle`.revision
     val `kamon-zipkin` = "io.kamon" %% "kamon-zipkin" % `kamon-bundle`.revision
     val `kamon-opentelemetry` = "io.kamon" %% "kamon-opentelemetry"  % `kamon-bundle`.revision
