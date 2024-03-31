@@ -19,7 +19,7 @@ object Dependencies extends AutoPlugin {
     val `kamon-zipkin` = "io.kamon" %% "kamon-zipkin" % `kamon-bundle`.revision
     val `kamon-opentelemetry` = "io.kamon" %% "kamon-opentelemetry"  % `kamon-bundle`.revision
 
-    val `slf4j-simple` = "org.slf4j" % "slf4j-simple" % "1.7.32"
+    val `slf4j-simple` = "org.slf4j" % "slf4j-simple" % "1.7.36"
 
   }
 
